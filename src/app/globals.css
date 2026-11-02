@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Design tokens — MedTech / scientific / premium
+   ------------------------------------------------------------------ */
+@theme {
+  /* Surfaces */
+  --color-night: #050b18;
+  --color-night-2: #0a1428;
+  --color-night-3: #101d38;
+  --color-paper: #f6f5f1;
+  --color-mist: #eceef1;
+
+  /* Text */
+  --color-ink: #0b1220;
+  --color-ink-soft: #4a5568;
+  --color-fog: #9fb0c8;
+
+  /* Signal colours (each one has a semantic meaning on the page) */
+  --color-physio: #4c8dff; /* physiological stream  */
+  --color-tech: #19e6d4; /* technology / electric turquoise */
+  --color-bio: #1fbf9a; /* biochemistry / teal-green */
+  --color-accent: #67e8f9; /* luminous cyan accent */
+  --color-alert: #ffb547; /* deviations / anomalies */
+
+  /* Typography */
+  --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --ease-precise: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-night);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-tech) 35%, transparent);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Utilities
+   ------------------------------------------------------------------ */
+@utility container-x {
+  width: 100%;
+  max-width: 1240px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+  @media (width >= 48rem) {
+    padding-inline: 2.5rem;
+  }
+}
+
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  line-height: 1rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+@utility section-y {
+  padding-block: 6rem;
+  @media (width >= 64rem) {
+    padding-block: 9rem;
+  }
+}
+
+@utility hairline-dark {
+  border-color: rgb(148 178 220 / 0.14);
+}
+
+@utility hairline-light {
+  border-color: rgb(11 18 32 / 0.1);
+}
+
+@utility text-gradient-signal {
+  background: linear-gradient(90deg, var(--color-physio), var(--color-tech) 55%, var(--color-bio));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility bg-grid-dark {
+  background-image:
+    linear-gradient(rgb(148 178 220 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(148 178 220 / 0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+@utility bg-grid-light {
+  background-image:
+    linear-gradient(rgb(11 18 32 / 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(11 18 32 / 0.045) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Continuous flow along an SVG path (microfluidics, data traces) */
+@keyframes dash-flow {
+  to {
+    stroke-dashoffset: -200;
+  }
+}
+@utility animate-dash-flow {
+  animation: dash-flow 6s linear infinite;
+}
+
+@keyframes soft-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@utility animate-soft-pulse {
+  animation: soft-pulse 2.4s ease-in-out infinite;
+}
+
+/* ------------------------------------------------------------------
+   Reduced motion: every animation has a static, readable state
+   ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
