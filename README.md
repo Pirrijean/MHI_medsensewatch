@@ -4,26 +4,26 @@ Official landing page for **MedSense Watch** by **MHI (Molecular Health Intellig
 
 ## Tech Stack
 
-- **Framework:** Next.js 15 (App Router) + React 19 + TypeScript
+- **Framework:** Next.js 15 (App Router, configured with `output: "export"` for static deployment on Cloudflare Pages) + React 19 + TypeScript
 - **Styling:** Tailwind CSS v4
 - **Animations & Interactivity:** Motion (`motion/react`), custom analytical SVGs (2D molecular structures, 3-electrode DPV microfluidic cell, 7-layer scroll exploded view, live multi-screen Watch OS showcase, native companion app prototype)
-- **Forms & Validation:** React Hook Form + Zod v4 (`POST /api/contact` with honeypot, submission timing check, per-IP rate limiting, and optional webhook forwarding)
+- **Forms & Validation:** React Hook Form + Zod v4, compatible with the standalone Cloudflare Pages Function (`functions/api/contact.js`) or an external form endpoint (`NEXT_PUBLIC_CONTACT_ENDPOINT`)
 
-## Local Development
+## Local Development & Static Build
 
 ```bash
 npm install
-npm run dev
+npm run dev     # http://localhost:3000
+npm run build   # Generates static export in ./out
 ```
 
-Open `http://localhost:3000`.
+## Cloudflare Pages Deployment
 
-## Configuration
-
-- **Brand & Product Metadata:** `src/lib/site.ts`
-- **Biomarkers, Sensors, Applications & Cartridges:** `src/data/*.ts`
-- **Optional Environment Variables (`.env.local`):**
+- **Build command:** `npm run build`
+- **Build output directory:** `out`
+- **Optional Environment Variables:**
   - `NEXT_PUBLIC_SITE_URL` — canonical deployment URL
+  - `NEXT_PUBLIC_CONTACT_ENDPOINT` — optional external form endpoint (defaults to `/api/contact` handled by `functions/api/contact.js`)
   - `NEXT_PUBLIC_GA_ID` — Google Analytics 4 measurement ID
   - `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` — Plausible analytics domain
-  - `LEAD_WEBHOOK_URL` — webhook endpoint to forward captured partnership inquiries
+  - `LEAD_WEBHOOK_URL` — webhook endpoint in Cloudflare Pages to forward captured partnership inquiries

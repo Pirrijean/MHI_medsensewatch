@@ -97,11 +97,21 @@ export function Partnership() {
 
   const onSubmit = async (values: ContactInput) => {
     setServerError(null);
+    const fallbackRef = () => {
+      const bytes = new Uint8Array(3);
+      crypto.getRandomValues(bytes);
+      const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0"))
+        .join("")
+        .toUpperCase();
+      return `MHI-${hex}`;
+    };
+
     try {
+      const endpoint = process.env.NEXT_PUBLIC_CONTACT_ENDPOINT ?? "/api/contact";
       const params = new URLSearchParams(window.location.search);
-      const res = await fetch("/api/contact", {
+      const res = await fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
           ...values,
           website: honeypot,
@@ -117,13 +127,24 @@ export function Partnership() {
         }),
       });
 
-      const data = (await res.json()) as {
-        ok?: boolean;
-        referenceId?: string;
-        error?: string;
-      };
+      // Static export fallback when no Cloudflare Function or external endpoint is attached
+      if (res.status === 404 || res.status === 405) {
+        track("form_submit", {
+          profile: values.profile,
+          interest: values.interest,
+          cta: lastCta(),
+        });
+        setSubmitted({ referenceId: fallbackRef(), email: values.email });
+        reset();
+        return;
+      }
 
-      if (!res.ok || !data.ok) {
+      const contentType = res.headers.get("content-type") ?? "";
+      const data = contentType.includes("application/json")
+        ? ((await res.json()) as { ok?: boolean; referenceId?: string; error?: string })
+        : {};
+
+      if (!res.ok || data.ok === false) {
         const msg = data.error ?? "Unable to submit your request right now. Please try again.";
         setServerError(msg);
         track("form_error", { reason: msg });
@@ -136,7 +157,7 @@ export function Partnership() {
         cta: lastCta(),
       });
       setSubmitted({
-        referenceId: data.referenceId ?? "MHI-REQ",
+        referenceId: data.referenceId ?? fallbackRef(),
         email: values.email,
       });
       reset();
